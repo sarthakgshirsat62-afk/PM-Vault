@@ -224,7 +224,15 @@ Decisions made with the human; follow them unless a newer entry overrides.
 | 2026-09-29 | Exact `editorial_score` lives in the staff-only `resource_curation` table so the public API can never read it. |
 | 2026-09-29 | Navigation, content pages (About/Privacy), homepage blocks and site settings are all DB-driven (`nav_items`, `pages`, `homepage_blocks`, `site_settings`). |
 | 2026-09-29 | Pinned TypeScript 6.0 (TS 7 native port changes the JS API Next relies on) and ESLint 9 (flat config). Fonts use system stacks (no build-time network fetch). |
+| 2026-09-29 | Tried ESLint 10: incompatible with the `eslint-plugin-react` bundled in `eslint-config-next` 16.3 (`getFilename is not a function`). Stay on ESLint 9 until eslint-config-next supports 10. |
 | 2026-09-29 | Editorial list fields (best_for, use_when, avoid_when, how_to_use, strengths, limitations) are `text[]` rendered as plain text — no HTML/markdown rendering, avoiding XSS. |
+| 2026-09-29 | `proxy.ts` runs only on `/admin`, `/login`, `/auth`. Public pages never read auth cookies so they stay ISR-cached; every admin mutation calls `revalidatePublicContent()` (lib/revalidate.ts) to purge pages + sitemap. |
+| 2026-09-29 | Every admin page calls `requireRolePage()` and every server action calls `requireRole()` itself — layouts and pages render concurrently, so a layout guard alone is not enough. The admin segment is `force-dynamic`. |
+| 2026-09-29 | Collections deferred to P1 (the PRD lists them in Sprint 5, but they are P1 scope). Newsletter, accounts and the card Save button are also P1. |
+| 2026-09-29 | Bulk import is capped at 500 rows / 700 KB per file (Next.js 1 MB server-action body limit); imported rows are always drafts and re-validated server-side. |
+| 2026-09-29 | Approving a submission creates a **draft** resource; an editor completes and publishes it. |
+| 2026-09-29 | "Most popular" shows only resources with real activity (views + 3× outbound clicks, 30 days); the block hides itself when there is none. |
+| 2026-09-29 | Outbound links go through `/go/[slug]`, which resolves the destination from the DB only (no open redirect) and skips logging for likely bots. |
 
 <!-- BEGIN:nextjs-agent-rules -->
 
