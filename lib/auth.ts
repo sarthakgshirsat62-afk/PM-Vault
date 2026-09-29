@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/env";
 import { hasRole } from "@/lib/roles";
 import type { UserRole } from "@/types/domain";
 
@@ -14,6 +15,8 @@ export type SessionUser = {
 
 /** Current user + role, verified with the auth server (not just the cookie). */
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
+  // Not configured = nobody can be signed in (fails closed → login page).
+  if (!isSupabaseConfigured()) return null;
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;

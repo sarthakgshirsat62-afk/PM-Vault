@@ -149,8 +149,12 @@ export async function getRecentlyAdded(limit = 4): Promise<ResourceCard[]> {
   return (await searchResources({ sort: "newest", pageSize: limit })).items;
 }
 
+/** Resources with real recent activity only; empty when there is none. */
 export async function getMostPopular(limit = 4): Promise<ResourceCard[]> {
-  return (await searchResources({ sort: "popular", pageSize: limit })).items;
+  const db = publicDb();
+  if (!db) return [];
+  const data = check(await db.rpc("popular_resources", { p_limit: limit }), "loading popular resources");
+  return (data ?? []) as ResourceCard[];
 }
 
 export async function getPublishedSlugs(): Promise<{ slug: string; updated_at: string }[]> {

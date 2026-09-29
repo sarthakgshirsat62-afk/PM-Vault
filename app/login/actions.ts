@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteUrl } from "@/lib/env";
+import { getSiteUrl, isSupabaseConfigured } from "@/lib/env";
 import { safeRelativePath } from "@/lib/url";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -16,6 +16,9 @@ const schema = z.object({
 export async function sendMagicLink(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const parsed = schema.safeParse({ email: formData.get("email"), next: formData.get("next") ?? undefined });
   if (!parsed.success) return { status: "error", message: "Enter a valid email address." };
+  if (!isSupabaseConfigured()) {
+    return { status: "error", message: "Sign-in isn't set up yet: the site has no Supabase connection (see docs/SETUP.md)." };
+  }
 
   if (!(await checkRateLimit("login", 5, 600))) {
     return { status: "error", message: "Too many attempts. Please wait a few minutes and try again." };
