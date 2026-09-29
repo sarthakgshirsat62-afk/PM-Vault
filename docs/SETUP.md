@@ -30,6 +30,7 @@ Run each file in `supabase/migrations/` **in filename order** in Supabase → SQ
 
 1. `20260929000001_core_schema.sql` — tables, enums, triggers, RLS, storage bucket
 2. `20260929000002_search_and_analytics.sql` — grants, search, recommendations, analytics functions
+3. `20260929000003_popular_and_search_clicks.sql` — "Most popular" (real activity only) and search-result click logging
 
 Never edit a migration that has already been applied — add a new file instead.
 
@@ -69,9 +70,33 @@ npm test           # vitest
 npm run build
 ```
 
-## 7. Known limitations (MVP)
+## 7. Managing content (no code, no deploy)
+
+| Task | Where |
+|---|---|
+| Add / edit / publish / unpublish a resource | `/admin/resources` → Add resource. Save draft · Submit for review · Publish · Preview |
+| Bulk import | `/admin/import` → upload CSV or JSON → review every row → import valid rows as **drafts** → `/admin/resources?status=draft` → select → "Set to Published" |
+| New category (gets `/category/<slug>` automatically) | `/admin/categories` → Add category (editorial intro + SEO fields) |
+| Subcategories | Open a category → Subcategories |
+| Resource types (`/type/<slug>`), tags, filter values | `/admin/types`, `/admin/tags`, `/admin/filters` |
+| Homepage blocks (order, headings, hand-picked resources) | `/admin/homepage` |
+| Header links / About & Privacy pages / site name & SEO defaults | `/admin/navigation`, `/admin/pages`, `/admin/settings` |
+| Community submissions | `/admin/submissions` → Approve creates a **draft** · Reject |
+| Search analytics & content gaps | `/admin/analytics` |
+
+Every admin change purges the cached public pages and the sitemap immediately.
+
+**Roles in the UI:** editors see Resources, Submissions, Import and Tags; admins also see taxonomy, homepage, navigation, pages, analytics and settings, and can delete. The database enforces the same rules (RLS), independent of the UI.
+
+## 8. Not yet built (later phases)
+
+Member accounts & Google sign-in, saved resources, collections, newsletter, broken-link monitoring, voting, playbooks, AI features (P1+). The resource card has no Save button until accounts ship.
+
+## 9. Known limitations (MVP)
 
 - Analytics logging functions (`log_resource_view`, `log_search`, `log_resource_click`) are callable by anyone with the public anon key, so popularity numbers could be inflated by a determined abuser. Popularity is only 15% of ranking and editorial score outweighs it. Revisit (server-side secret or edge rate limiting) before scaling.
 - The rate limiter is a simple Postgres fixed-window counter keyed by a salted daily hash of the client IP; raw IPs are never stored.
 - No cookies are set for anonymous analytics, so session-level metrics (session depth, returning visitors) are not yet captured. Add them only with a consent mechanism.
 - `user_rating` in the ranking formula is 0 for all resources until voting ships (P2); it does not affect ordering.
+- Import files are capped at 500 rows / 700 KB (Next.js server-action body limit is 1 MB). Split larger datasets.
+- Analytics skip requests from obvious bots (user-agent heuristic); sophisticated bots can still be counted.

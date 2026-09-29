@@ -1,3 +1,4 @@
+import { requireRolePage } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ResourceDetailView } from "@/components/public/resource-detail";
@@ -7,6 +8,7 @@ import { LABELS } from "@/types/domain";
 export const metadata = { title: "Preview" };
 
 export default async function PreviewResourcePage(props: PageProps<"/admin/resources/[id]/preview">) {
+  await requireRolePage("editor", "/admin/resources");
   const { id } = await props.params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const resource = await adminGetResource(id);

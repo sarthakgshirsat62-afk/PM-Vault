@@ -1,3 +1,4 @@
+import { requireRolePage } from "@/lib/auth";
 import Link from "next/link";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { adminListResources, adminStatusCounts } from "@/services/admin-resources";
@@ -9,6 +10,7 @@ export const metadata = { title: "Resources" };
 const PAGE_SIZE = 50;
 
 export default async function AdminResourcesPage(props: PageProps<"/admin/resources">) {
+  await requireRolePage("editor", "/admin/resources");
   const sp = await props.searchParams;
   const statusParam = typeof sp.status === "string" ? sp.status : "";
   const status = (RESOURCE_STATUSES as readonly string[]).includes(statusParam) ? (statusParam as ResourceStatus) : null;

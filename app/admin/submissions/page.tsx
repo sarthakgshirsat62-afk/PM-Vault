@@ -1,3 +1,4 @@
+import { requireRolePage } from "@/lib/auth";
 import Link from "next/link";
 import { ActionForm } from "@/components/admin/action-form";
 import { AdminPageHeader } from "@/components/admin/page-header";
@@ -9,6 +10,7 @@ import { reviewSubmissionAction } from "./actions";
 export const metadata = { title: "Submissions" };
 
 export default async function SubmissionsPage(props: PageProps<"/admin/submissions">) {
+  await requireRolePage("editor", "/admin/submissions");
   const sp = await props.searchParams;
   const status = (SUBMISSION_STATUSES as readonly string[]).includes(String(sp.status)) ? (sp.status as SubmissionStatus) : "pending";
   const [submissions, counts] = await Promise.all([adminListSubmissions(status), adminSubmissionCounts()]);

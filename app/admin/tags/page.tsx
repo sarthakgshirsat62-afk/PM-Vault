@@ -2,7 +2,7 @@ import { ActionForm } from "@/components/admin/action-form";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { TextField } from "@/components/admin/fields";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, requireRolePage } from "@/lib/auth";
 import { hasRole } from "@/lib/roles";
 import { adminListTags } from "@/services/taxonomy";
 import { deleteTagAction, saveTagAction } from "../taxonomy-actions";
@@ -12,6 +12,7 @@ export const metadata = { title: "Tags" };
 const ROW = "grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]";
 
 export default async function TagsPage() {
+  await requireRolePage("editor", "/admin/tags");
   const [tags, user] = await Promise.all([adminListTags(), getSessionUser()]);
   const canDelete = hasRole(user?.role, "admin");
 

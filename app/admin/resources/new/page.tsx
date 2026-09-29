@@ -1,3 +1,4 @@
+import { requireRolePage } from "@/lib/auth";
 import Link from "next/link";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { ResourceForm } from "@/components/admin/resource-form";
@@ -6,6 +7,7 @@ import { adminListCategories, adminListSubcategories, adminListTerms, adminListT
 export const metadata = { title: "Add resource" };
 
 export default async function NewResourcePage() {
+  await requireRolePage("editor", "/admin/resources/new");
   const [categories, subcategories, types, terms] = await Promise.all([
     adminListCategories(),
     adminListSubcategories(),

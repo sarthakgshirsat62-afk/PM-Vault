@@ -1,9 +1,11 @@
+import { requireRolePage } from "@/lib/auth";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { ImportWizard } from "@/components/admin/import-wizard";
 
 export const metadata = { title: "Import" };
 
-export default function ImportPage() {
+export default async function ImportPage() {
+  await requireRolePage("editor", "/admin/import");
   return (
     <div>
       <AdminPageHeader

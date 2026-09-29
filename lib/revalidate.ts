@@ -7,4 +7,6 @@ import { revalidatePath } from "next/cache";
  */
 export function revalidatePublicContent(): void {
   revalidatePath("/", "layout");
+  // Metadata routes aren't under the root layout; purge the sitemap explicitly.
+  revalidatePath("/sitemap.xml");
 }

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ResourceForm } from "@/components/admin/resource-form";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, requireRolePage } from "@/lib/auth";
 import { hasRole } from "@/lib/roles";
 import { adminGetResource, listRevisions } from "@/services/admin-resources";
 import { adminListCategories, adminListSubcategories, adminListTerms, adminListTypes } from "@/services/taxonomy";
@@ -15,6 +15,7 @@ export const metadata = { title: "Edit resource" };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function EditResourcePage(props: PageProps<"/admin/resources/[id]">) {
+  await requireRolePage("editor", "/admin/resources");
   const { id } = await props.params;
   const sp = await props.searchParams;
   if (!UUID.test(id)) notFound();
