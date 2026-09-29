@@ -39,8 +39,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    // Skip static assets, images, the click redirector and metadata files.
-    "/((?!_next/static|_next/image|favicon.ico|go/|sitemap.xml|robots.txt|.*\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico)$).*)",
-  ],
+  // Only routes that use the session. Public pages never read auth cookies,
+  // so they stay statically cacheable and skip this network round-trip.
+  matcher: ["/admin/:path*", "/login", "/auth/:path*"],
 };

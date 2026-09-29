@@ -9,8 +9,9 @@ import { getSupabaseEnv } from "@/lib/env";
  * with the visitor's permissions, so RLS is always enforced.
  */
 export async function createClient() {
-  const { url, anonKey } = getSupabaseEnv();
+  // Read cookies first: this marks the route as dynamic before any env check.
   const cookieStore = await cookies();
+  const { url, anonKey } = getSupabaseEnv();
   return createServerClient(url, anonKey, {
     cookies: {
       getAll() {
