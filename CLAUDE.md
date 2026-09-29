@@ -188,15 +188,50 @@ Work only on the phase/sprint the human has asked for. Do not build later-phase 
 
 ## 11. Common Commands
 
-*(Fill in once the project is scaffolded. Claude must ask before running any command not listed here that changes state.)*
+Claude must ask before running any command not listed here that changes state. Setup details: `docs/SETUP.md`. Full PRD: `docs/PRD.md`.
 
 ```bash
 npm install          # install dependencies (ask first if adding new packages)
-npm run dev          # local dev server
-npm run lint         # lint
-npm run typecheck    # tsc --noEmit
-npm test             # tests
+npm run dev          # local dev server (http://localhost:3000)
+npm run lint         # eslint (flat config, eslint-config-next)
+npm run typecheck    # next typegen && tsc --noEmit
+npm test             # vitest run (tests/**/*.test.ts)
 npm run build        # production build check
 ```
 
+Database migrations live in `supabase/migrations/` and are run by the human in the Supabase SQL editor (no Docker/CLI on the dev machine). `supabase/seed.sql` is local-dev only.
+
 Before declaring any task complete: run lint, typecheck, tests and build, and report results honestly.
+
+---
+
+## 12. Decisions Log
+
+Decisions made with the human; follow them unless a newer entry overrides.
+
+| Date | Decision |
+|---|---|
+| 2026-09-29 | Product name in UI: **PM Vault** (stored in `site_settings`, editable without code). |
+| 2026-09-29 | Work in the nested clone `PM-Vault/PM-Vault` on feature branches; build the P0 MVP sprint by sprint (1–6), pausing for review after each. |
+| 2026-09-29 | Database: **hosted Supabase**. The human runs migrations in the SQL editor after reviewing them. The app never uses the service-role key; all access goes through the anon key + user session + RLS. |
+| 2026-09-29 | Category URLs are **`/category/[slug]`** only (no per-section routes like `/prd-templates`). Resource-type listings use `/type/[slug]`. Top-level SEO aliases may come later as DB-driven redirects. |
+| 2026-09-29 | **Submissions + moderation are in P0** (acceptance criteria 18–19), despite being listed under P1. |
+| 2026-09-29 | Auth in P0 = email magic link (for staff). Google OAuth, member accounts and saves = P1. |
+| 2026-09-29 | Analytics = **first-party Supabase tables** (`resource_views`, `resource_clicks`, `search_queries`); no third-party analytics and no anonymous tracking cookies in P0. |
+| 2026-09-29 | First admin is created by the human with a one-line SQL `update profiles set role='super_admin'`; no in-app bootstrap path. |
+| 2026-09-29 | Tests: **Vitest only** (unit tests for business logic). No Playwright for now. |
+| 2026-09-29 | Filter dimensions (persona, career level, product type, product stage, company stage, format) are rows in one `taxonomy_terms` table (`kind` enum) with `resource_terms`, replacing separate `personas`/`resource_personas` tables. Admins add values without code; a new *dimension* is a migration. |
+| 2026-09-29 | Exact `editorial_score` lives in the staff-only `resource_curation` table so the public API can never read it. |
+| 2026-09-29 | Navigation, content pages (About/Privacy), homepage blocks and site settings are all DB-driven (`nav_items`, `pages`, `homepage_blocks`, `site_settings`). |
+| 2026-09-29 | Pinned TypeScript 6.0 (TS 7 native port changes the JS API Next relies on) and ESLint 9 (flat config). Fonts use system stacks (no build-time network fetch). |
+| 2026-09-29 | Editorial list fields (best_for, use_when, avoid_when, how_to_use, strengths, limitations) are `text[]` rendered as plain text — no HTML/markdown rendering, avoiding XSS. |
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
