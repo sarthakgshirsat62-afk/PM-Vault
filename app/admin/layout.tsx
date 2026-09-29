@@ -4,6 +4,9 @@ import { requireRolePage } from "@/lib/auth";
 import { hasRole } from "@/lib/roles";
 import { AdminNav, type AdminNavItem } from "@/components/admin/admin-nav";
 
+// Always render per request: admin pages must never be statically cached.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: { default: "Admin", template: "%s · Admin" }, robots: { index: false, follow: false } };
 
 const EDITOR_ITEMS: AdminNavItem[] = [
